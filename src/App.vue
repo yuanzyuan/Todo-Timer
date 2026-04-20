@@ -1,15 +1,12 @@
 <template>
-  <div class="glassmorphism w-full h-full p-4">
-    <!-- 拖拽区域 -->
-    <div data-tauri-drag-region class="drag-region"></div>
-    
+  <div class="glassmorphism w-full h-full p-4 flex flex-col">
     <!-- 主标题 -->
     <h1 class="text-xl font-bold mb-4 text-center">Todo Timer Plugin</h1>
     
     <!-- 看板容器 -->
-    <div class="flex gap-4 h-[calc(100%-80px)]">
+    <div class="flex gap-4 flex-1 min-h-0">
       <!-- 待办列 -->
-      <div class="flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col min-h-0">
         <div class="flex items-center justify-between mb-3 gap-2">
           <h2 class="text-lg font-semibold">待办</h2>
           <button
@@ -19,7 +16,7 @@
             + 创建任务
           </button>
         </div>
-        <div class="space-y-2 overflow-y-auto flex-1">
+        <div class="space-y-2 overflow-y-auto flex-1 min-h-0">
           <div
             v-if="todoTasks.length === 0"
             class="h-full min-h-24 flex flex-col items-center justify-center gap-3 text-sm text-white/80"
@@ -43,9 +40,9 @@
       </div>
       
       <!-- 进行中列 -->
-      <div class="flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col min-h-0">
         <h2 class="text-lg font-semibold mb-3">进行中</h2>
-        <div class="space-y-2 overflow-y-auto flex-1">
+        <div class="space-y-2 overflow-y-auto flex-1 min-h-0">
           <TaskCard 
             v-for="task in inProgressTasks" 
             :key="task.id"
@@ -58,9 +55,9 @@
       </div>
       
       <!-- 已完成列 -->
-      <div class="flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col min-h-0">
         <h2 class="text-lg font-semibold mb-3">已完成</h2>
-        <div class="space-y-2 overflow-y-auto flex-1">
+        <div class="space-y-2 overflow-y-auto flex-1 min-h-0">
           <TaskCard 
             v-for="task in completedTasks" 
             :key="task.id"
@@ -330,11 +327,3 @@ onMounted(() => {
   loadTasks()
 })
 </script>
-
-<style scoped>
-#app {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-</style>

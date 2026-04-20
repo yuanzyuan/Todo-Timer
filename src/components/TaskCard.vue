@@ -25,6 +25,13 @@
     </div>
     
     <!-- 阻塞信息 -->
+    <div
+      v-if="task.status === 'in-progress' && task.isBlocked"
+      class="text-xs text-danger mb-2"
+    >
+      当前阻塞：{{ task.currentBlockerReason || '未填写原因' }}（{{ formatTime(getCurrentBlockedDuration()) }}）
+    </div>
+
     <div v-if="visibleBlockerLogs.length > 0" class="text-xs text-danger mb-3">
       <div v-for="(log, index) in visibleBlockerLogs" :key="index">
         {{ log.reason }}: {{ formatTime(log.duration) }}
@@ -140,6 +147,14 @@ function getCurrentActiveTime(): number {
   }
   
   return now.value - props.task.startTime
+}
+
+function getCurrentBlockedDuration(): number {
+  if (props.task.status !== 'in-progress' || !props.task.isBlocked || !props.task.blockedStartTime) {
+    return 0
+  }
+
+  return now.value - props.task.blockedStartTime
 }
 
 // 格式化时间

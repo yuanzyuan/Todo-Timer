@@ -17,10 +17,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  display: block;
   min-width: 320px;
   min-height: 100vh;
   overflow: hidden;
@@ -40,8 +46,4 @@ body {
 
 .task-card.blocked {
   @apply bg-danger/10;
-}
-
-.drag-region {
-  @apply h-6 w-full cursor-move -mt-6 -mx-4 mb-4;
 }
