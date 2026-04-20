@@ -6,8 +6,6 @@
 - 专注计时（Focus / Block / Pause）
 - 阻塞管理与记录沉淀（支持导出 Markdown）
 
-![Board Overview](./docs/images/board-overview.svg)
-
 ## 核心能力
 
 - 三列并行看板：`Todo` / `In Progress` / `Completed`
@@ -29,10 +27,6 @@
   - 可配置自动导出开关与每日导出时间
   - macOS 下支持访达目录选择
 - 数据持久化：本地 `localStorage`
-
-## 状态流转
-
-![Workflow](./docs/images/workflow.svg)
 
 ## 技术栈
 
@@ -92,10 +86,6 @@ npm run tauri build
 
 ```text
 todo-timer-plugin/
-├── docs/
-│   └── images/
-│       ├── board-overview.svg
-│       └── workflow.svg
 ├── src/
 │   ├── App.vue
 │   ├── style.css
