@@ -1,0 +1,63 @@
+<svg width="1400" height="780" viewBox="0 0 1400 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="780" rx="24" fill="#EEF3F9"/>
+  <rect x="28" y="24" width="1344" height="92" rx="20" fill="#D8E3F6"/>
+  <circle cx="68" cy="70" r="12" fill="#3F5F92"/>
+  <text x="94" y="79" fill="#2D333A" font-family="Arial, sans-serif" font-size="38" font-weight="700">To do Timer</text>
+  <rect x="1038" y="45" width="300" height="50" rx="25" fill="#C7D4EA"/>
+  <text x="1068" y="77" fill="#7A879D" font-family="Arial, sans-serif" font-size="28">Search tasks...</text>
+
+  <rect x="28" y="142" width="430" height="610" rx="24" fill="#DDE4EF"/>
+  <rect x="486" y="142" width="430" height="610" rx="24" fill="#D7E4FB"/>
+  <rect x="944" y="142" width="428" height="610" rx="24" fill="#DDE4EF"/>
+
+  <text x="62" y="198" fill="#2F363D" font-family="Arial, sans-serif" font-size="52" font-weight="700">Todo</text>
+  <circle cx="216" cy="184" r="24" fill="#B9C9E7"/>
+  <text x="206" y="194" fill="#2F568F" font-family="Arial, sans-serif" font-size="26" font-weight="700">6</text>
+
+  <text x="520" y="198" fill="#2F363D" font-family="Arial, sans-serif" font-size="52" font-weight="700">In Progress</text>
+  <rect x="838" y="168" width="20" height="20" rx="10" fill="#7FA3D9"/>
+  <rect x="864" y="168" width="20" height="20" rx="10" fill="#7FA3D9"/>
+
+  <text x="978" y="198" fill="#2F363D" font-family="Arial, sans-serif" font-size="52" font-weight="700">Completed</text>
+  <circle cx="1308" cy="183" r="24" fill="#B9C9E7"/>
+  <text x="1296" y="194" fill="#2F568F" font-family="Arial, sans-serif" font-size="28" font-weight="700">✓</text>
+
+  <rect x="62" y="230" width="362" height="72" rx="36" fill="#BCCAE2"/>
+  <text x="177" y="278" fill="#3E5E92" font-family="Arial, sans-serif" font-size="48" font-weight="700">+ Add Task</text>
+
+  <rect x="62" y="326" width="362" height="190" rx="22" fill="#F4F7FC"/>
+  <rect x="84" y="352" width="98" height="46" rx="12" fill="#DCE5F2"/>
+  <text x="107" y="384" fill="#7A5A2C" font-family="Arial, sans-serif" font-size="34" font-weight="700">中</text>
+  <rect x="202" y="352" width="190" height="46" rx="23" fill="#E8EEF8"/>
+  <text x="232" y="384" fill="#8A97A8" font-family="Arial, sans-serif" font-size="32">学习</text>
+  <rect x="84" y="420" width="308" height="76" rx="16" fill="#D3DCE9"/>
+  <text x="110" y="470" fill="#2F363D" font-family="Arial, sans-serif" font-size="48" font-weight="700">整理笔记</text>
+
+  <rect x="520" y="230" width="362" height="390" rx="28" fill="#C7D8F6"/>
+  <rect x="542" y="256" width="86" height="36" rx="18" fill="#F6E1D4"/>
+  <text x="568" y="281" fill="#7A5A2C" font-family="Arial, sans-serif" font-size="24" font-weight="700">中</text>
+  <rect x="790" y="252" width="72" height="42" rx="21" fill="#DFE8F7"/>
+  <text x="805" y="280" fill="#7B889C" font-family="Arial, sans-serif" font-size="24" font-weight="700">暂停</text>
+  <rect x="870" y="252" width="72" height="42" rx="21" fill="#2E6A4A"/>
+  <text x="892" y="280" fill="#EAF9EF" font-family="Arial, sans-serif" font-size="24" font-weight="700">完成</text>
+  <rect x="542" y="308" width="340" height="66" rx="14" fill="#D3DCE9"/>
+  <text x="638" y="352" fill="#2F363D" font-family="Arial, sans-serif" font-size="44" font-weight="700">测试3</text>
+  <text x="650" y="430" fill="#35548A" font-family="Arial, sans-serif" font-size="38" font-weight="700">BLOCK SESSION</text>
+  <text x="648" y="498" fill="#345386" font-family="Arial, sans-serif" font-size="86" font-weight="800">02:29</text>
+  <text x="700" y="544" fill="#5E6975" font-family="Arial, sans-serif" font-size="34" font-weight="700">Block 2m 29s</text>
+  <rect x="676" y="566" width="100" height="52" rx="26" fill="#DCE3EA"/>
+  <text x="703" y="601" fill="#83533C" font-family="Arial, sans-serif" font-size="34" font-weight="700">恢复</text>
+
+  <rect x="978" y="230" width="356" height="88" rx="20" fill="#F5F8FD"/>
+  <rect x="978" y="230" width="8" height="88" rx="4" fill="#B7E4C8"/>
+  <text x="1006" y="277" fill="#6F7984" font-family="Arial, sans-serif" font-size="42" text-decoration="line-through">Setup Repository</text>
+  <text x="1006" y="304" fill="#5E8B73" font-family="Arial, sans-serif" font-size="30">Total: 1h 15m</text>
+  <text x="1218" y="304" fill="#7C868E" font-family="Arial, sans-serif" font-size="30">Today, 10:30</text>
+
+  <rect x="978" y="338" width="356" height="138" rx="20" fill="#F5F8FD"/>
+  <rect x="978" y="338" width="8" height="138" rx="4" fill="#B7E4C8"/>
+  <text x="1006" y="385" fill="#6F7984" font-family="Arial, sans-serif" font-size="42" text-decoration="line-through">Draft Q3 Plan</text>
+  <text x="1006" y="420" fill="#9A6A4F" font-family="Arial, sans-serif" font-size="28">Blocked (15m): waiting review</text>
+  <text x="1006" y="460" fill="#5E8B73" font-family="Arial, sans-serif" font-size="30">Total: 2h 45m</text>
+  <text x="1226" y="460" fill="#7C868E" font-family="Arial, sans-serif" font-size="30">Yesterday</text>
+</svg>
