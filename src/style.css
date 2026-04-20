@@ -1,16 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --surface: #f7f9fc;
+  --surface-container: #eaeef3;
+  --surface-container-lowest: #ffffff;
+  --surface-container-highest: #dce3e9;
+  --primary: #415f93;
+  --on-surface: #2c3338;
+
+  font-family: 'Manrope', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: rgba(15, 23, 42, 0.5);
-
+  color: var(--on-surface);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -26,24 +31,11 @@ body,
 
 body {
   margin: 0;
-  display: block;
   min-width: 320px;
-  min-height: 100vh;
   overflow: hidden;
+  background: var(--surface);
 }
 
-.glassmorphism {
-  @apply bg-white/20 backdrop-blur-lg border border-white/30 rounded-lg shadow-lg;
-}
-
-.task-card {
-  @apply glassmorphism p-4 mb-3 transition-all duration-300;
-}
-
-.task-card.in-progress {
-  @apply border-2 border-success animate-pulse-slow;
-}
-
-.task-card.blocked {
-  @apply bg-danger/10;
+* {
+  box-sizing: border-box;
 }
