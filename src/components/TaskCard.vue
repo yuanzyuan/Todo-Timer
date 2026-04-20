@@ -6,7 +6,8 @@
       'task-card--progress': task.status === 'in-progress' && !hero,
       'task-card--hero': task.status === 'in-progress' && hero,
       'task-card--completed': task.status === 'completed',
-      'task-card--blocked': task.isBlocked
+      'task-card--blocked': task.isBlocked,
+      'task-card--paused': task.status === 'in-progress' && task.isPaused
     }"
   >
     <div class="task-meta-row">
@@ -45,25 +46,47 @@
       @blur="saveTitle"
       @keyup.enter="saveTitle"
       class="title-input"
-      :class="{ 'title-input--completed': task.status === 'completed' }"
+      :class="{
+        'title-input--completed': task.status === 'completed',
+        'title-input--center': task.status === 'in-progress'
+      }"
     />
 
     <div class="time-panel">
       <template v-if="task.status === 'in-progress' && hero">
-        <div class="focus-tag">FOCUS SESSION</div>
-        <div class="hero-time">{{ formatHeroTime(getCurrentTotalElapsedTime()) }}</div>
-        <div class="hero-session">
-          Session {{ formatTime(getCurrentActiveTime()) }}
+        <div class="time-points">
+          <span>开始 {{ formatTimePoint(task.startedAt) }}</span>
         </div>
+        <div class="focus-tag">{{ task.isBlocked ? 'BLOCK SESSION' : 'FOCUS SESSION' }}</div>
+        <div class="hero-time">
+          {{ formatHeroTime(task.isBlocked ? getCurrentBlockedDuration() : getCurrentTotalElapsedTime()) }}
+        </div>
+        <div class="hero-session">
+          {{ task.isBlocked ? 'Block' : 'Session' }} {{ formatTime(task.isBlocked ? getCurrentBlockedDuration() : getCurrentActiveTime()) }}
+        </div>
+        <div v-if="task.isPaused" class="paused-now">已暂停（{{ formatTimePoint(task.pauseLogs[task.pauseLogs.length - 1]?.pausedAt) }}）</div>
       </template>
       <template v-else-if="task.status === 'in-progress'">
+        <div class="time-points">
+          <span>开始 {{ formatTimePoint(task.startedAt) }}</span>
+        </div>
         <div class="time-summary">
-          <span>Session {{ formatTime(getCurrentActiveTime()) }}</span>
+          <span>{{ task.isBlocked ? 'Block' : 'Session' }} {{ formatTime(task.isBlocked ? getCurrentBlockedDuration() : getCurrentActiveTime()) }}</span>
           <span>Total {{ formatTime(getCurrentTotalElapsedTime()) }}</span>
         </div>
+        <div v-if="task.isPaused" class="paused-now">已暂停（{{ formatTimePoint(task.pauseLogs[task.pauseLogs.length - 1]?.pausedAt) }}）</div>
       </template>
       <template v-else-if="task.status === 'completed'">
-        总时间: {{ formatTime(task.totalElapsedTime) }}
+        <div class="time-points">
+          <span>开始 {{ formatTimePoint(task.startedAt) }}</span>
+          <span>结束 {{ formatTimePoint(task.endedAt) }}</span>
+        </div>
+        <div class="time-summary time-summary--completed">
+          <span>总时间 {{ formatTime(task.totalElapsedTime) }}</span>
+          <span>阻塞 {{ formatTime(getBlockedTotalTime()) }}</span>
+          <span>Focus {{ formatTime(getFocusTotalTime()) }}</span>
+        </div>
+        <div class="completed-date">{{ formatCompletedDate(task.completedAt) }}</div>
       </template>
     </div>
 
@@ -74,13 +97,27 @@
       当前阻塞：{{ task.currentBlockerReason || '未填写原因' }}（{{ formatTime(getCurrentBlockedDuration()) }}）
     </div>
 
-    <div v-if="visibleBlockerLogs.length > 0" class="blocked-log">
-      <div v-for="(log, index) in visibleBlockerLogs" :key="index">
-        Blocked {{ formatTime(log.duration) }}: {{ log.reason }}
+    <div
+      v-if="visibleBlockerLogs.length > 0"
+      class="blocked-log"
+      :class="{ 'blocked-log--highlight': task.status === 'in-progress' }"
+    >
+      <div
+        v-for="(log, index) in visibleBlockerLogs"
+        :key="index"
+        class="blocked-log-item"
+      >
+        阻塞点 {{ index + 1 }} · {{ formatTime(log.duration) }}：{{ log.reason }}
       </div>
     </div>
 
-    <div class="actions">
+    <div v-if="visiblePauseLogs.length > 0" class="pause-log">
+      <div v-for="(log, index) in visiblePauseLogs" :key="`pause-${index}`" class="pause-log-item">
+        暂停点 {{ index + 1 }} · {{ formatTimePoint(log.pausedAt) }} → {{ formatTimePoint(log.resumedAt) }}
+      </div>
+    </div>
+
+    <div class="actions" :class="{ 'actions--center': task.status === 'in-progress' }">
       <button
         v-if="task.status === 'todo'"
         @click="emit('start-task', task.id)"
@@ -97,20 +134,39 @@
       </button>
 
       <template v-if="task.status === 'in-progress'">
+        <div class="progress-top-actions">
+          <button
+            @click="emit('toggle-pause', task.id)"
+            class="btn btn--soft btn--mini"
+            :class="{ 'btn--pause': !task.isPaused, 'btn--resume': task.isPaused }"
+            :disabled="task.isBlocked"
+          >
+            {{ task.isPaused ? '继续' : '暂停' }}
+          </button>
+          <button
+            @click="emit('complete-task', task.id)"
+            class="btn btn--success btn--mini"
+          >
+            完成
+          </button>
+        </div>
         <button
           @click="emit('toggle-block', task.id)"
-          class="btn btn--soft"
+          class="btn btn--soft btn--block-main"
           :class="{ 'btn--warn': !task.isBlocked, 'btn--ok': task.isBlocked }"
+          :disabled="task.isPaused"
         >
           {{ task.isBlocked ? '恢复' : '阻塞' }}
         </button>
-        <button
-          @click="emit('complete-task', task.id)"
-          class="btn btn--success"
-        >
-          完成
-        </button>
       </template>
+
+      <button
+        v-if="task.status === 'completed'"
+        @click="emit('delete-task', task.id)"
+        class="btn btn--danger"
+      >
+        删除
+      </button>
     </div>
   </article>
 </template>
@@ -123,6 +179,11 @@ interface BlockerLog {
   duration: number
 }
 
+interface PauseLog {
+  pausedAt: number
+  resumedAt?: number
+}
+
 interface Task {
   id: string
   title: string
@@ -131,6 +192,11 @@ interface Task {
   status: 'todo' | 'in-progress' | 'completed'
   totalActiveTime: number
   totalElapsedTime: number
+  completedAt?: number
+  startedAt?: number
+  endedAt?: number
+  isPaused: boolean
+  pauseLogs: PauseLog[]
   blockerLogs: BlockerLog[]
   startTime?: number
   blockedStartTime?: number
@@ -155,12 +221,14 @@ const emit = defineEmits<{
   (e: 'start-task', taskId: string): void
   (e: 'delete-task', taskId: string): void
   (e: 'complete-task', taskId: string): void
+  (e: 'toggle-pause', taskId: string): void
 }>()
 
 const editableTitle = ref(props.task.title)
 const editablePriority = ref(props.task.priority)
 const editableCategory = ref(props.task.category)
 const visibleBlockerLogs = computed(() => props.task.blockerLogs.filter((log) => log.duration > 0))
+const visiblePauseLogs = computed(() => props.task.pauseLogs.filter((log) => !!log.pausedAt))
 const priorityClass = computed(() => {
   if (props.task.priority === '高') return 'priority-high'
   if (props.task.priority === '中') return 'priority-mid'
@@ -220,7 +288,7 @@ function saveCategory() {
 }
 
 function getCurrentActiveTime(): number {
-  if (props.task.status !== 'in-progress' || !props.task.startTime || props.task.isBlocked) {
+  if (props.task.status !== 'in-progress' || !props.task.startTime || props.task.isBlocked || props.task.isPaused) {
     return 0
   }
   return now.value - props.task.startTime
@@ -236,6 +304,14 @@ function getCurrentBlockedDuration(): number {
 function getCurrentTotalElapsedTime(): number {
   const blockedLoggedDuration = props.task.blockerLogs.reduce((acc, log) => acc + log.duration, 0)
   return props.task.totalActiveTime + blockedLoggedDuration + getCurrentActiveTime() + getCurrentBlockedDuration()
+}
+
+function getBlockedTotalTime(): number {
+  return props.task.blockerLogs.reduce((acc, log) => acc + log.duration, 0)
+}
+
+function getFocusTotalTime(): number {
+  return props.task.totalActiveTime
 }
 
 function formatHeroTime(ms: number): string {
@@ -260,6 +336,31 @@ function formatTime(ms: number): string {
   if (minutes > 0) return `${minutes}m ${seconds % 60}s`
   return `${seconds}s`
 }
+
+function formatCompletedDate(timestamp?: number): string {
+  if (!timestamp) return '—'
+
+  const date = new Date(timestamp)
+  const now = new Date()
+
+  const isSameDay = date.toDateString() === now.toDateString()
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  const isYesterday = date.toDateString() === yesterday.toDateString()
+
+  const timeText = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  if (isSameDay) return `Today, ${timeText}`
+  if (isYesterday) return `Yesterday, ${timeText}`
+
+  const dateText = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return `${dateText}, ${timeText}`
+}
+
+function formatTimePoint(timestamp?: number): string {
+  if (!timestamp) return '--:--'
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
 </script>
 
 <style scoped>
@@ -272,6 +373,7 @@ function formatTime(ms: number): string {
   background: var(--surface-container-lowest);
   box-shadow: 0 20px 30px rgba(44, 51, 56, 0.06);
   min-width: 0;
+  position: relative;
 }
 
 .task-card--hero {
@@ -286,8 +388,23 @@ function formatTime(ms: number): string {
   opacity: 0.82;
 }
 
+.task-card--todo,
+.task-card--completed {
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border-radius: 1.1rem;
+}
+
 .task-card--blocked {
   background: #f6ebe4;
+}
+
+.task-card--paused {
+  background: rgba(96, 190, 130, 0.2);
+}
+
+.task-card--hero.task-card--paused {
+  background: linear-gradient(180deg, rgba(96, 190, 130, 0.28), rgba(166, 196, 255, 0.25));
 }
 
 .task-meta-row {
@@ -295,6 +412,11 @@ function formatTime(ms: number): string {
   gap: 0.5rem;
   align-items: center;
   min-width: 0;
+}
+
+.task-card--progress .task-meta-row,
+.task-card--hero .task-meta-row {
+  padding-right: 5.8rem;
 }
 
 .priority-select,
@@ -316,15 +438,27 @@ function formatTime(ms: number): string {
 }
 
 .priority-high {
-  color: #8f2e35;
+  color: #a33b46;
 }
 
 .priority-mid {
-  color: #725420;
+  color: #7c5c24;
 }
 
 .priority-low {
-  color: #35654d;
+  color: #376c52;
+}
+
+.priority-select.priority-high {
+  background: rgba(250, 116, 111, 0.22);
+}
+
+.priority-select.priority-mid {
+  background: rgba(247, 199, 99, 0.26);
+}
+
+.priority-select.priority-low {
+  background: rgba(96, 190, 130, 0.24);
 }
 
 .category-input {
@@ -351,10 +485,29 @@ function formatTime(ms: number): string {
   opacity: 0.7;
 }
 
+.title-input--center {
+  text-align: center;
+}
+
+.task-card--todo .title-input,
+.task-card--completed .title-input {
+  font-size: 0.95rem;
+  padding: 0.36rem 0.58rem;
+}
+
 .time-panel {
   color: #596065;
   font-size: 0.82rem;
   min-height: 1.2rem;
+}
+
+.time-points {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.45rem;
+  font-size: 0.68rem;
+  color: #6a7176;
+  margin-bottom: 0.2rem;
 }
 
 .time-summary {
@@ -362,6 +515,20 @@ function formatTime(ms: number): string {
   justify-content: space-between;
   gap: 0.6rem;
   font-weight: 600;
+}
+
+.time-summary--completed {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.completed-date {
+  margin-top: 0.15rem;
+  text-align: right;
+  font-size: 0.68rem;
+  color: #7a8186;
 }
 
 .focus-tag {
@@ -393,6 +560,14 @@ function formatTime(ms: number): string {
   color: #596065;
 }
 
+.paused-now {
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #83533c;
+  font-weight: 700;
+}
+
 .tag-chip {
   border-radius: 9999px;
   padding: 0.24rem 0.72rem;
@@ -411,6 +586,21 @@ function formatTime(ms: number): string {
   color: #2f4f83;
 }
 
+.priority-chip.priority-high {
+  background: rgba(250, 116, 111, 0.2);
+  border: 1px solid rgba(163, 59, 70, 0.28);
+}
+
+.priority-chip.priority-mid {
+  background: rgba(247, 199, 99, 0.24);
+  border: 1px solid rgba(124, 92, 36, 0.24);
+}
+
+.priority-chip.priority-low {
+  background: rgba(96, 190, 130, 0.22);
+  border: 1px solid rgba(55, 108, 82, 0.24);
+}
+
 .blocked-current {
   border-radius: 0.7rem;
   background: rgba(254, 190, 161, 0.28);
@@ -426,9 +616,48 @@ function formatTime(ms: number): string {
   color: #7e5038;
 }
 
+.blocked-log-item {
+  border-radius: 0.7rem;
+  padding: 0.38rem 0.52rem;
+  background: rgba(254, 190, 161, 0.14);
+}
+
+.blocked-log--highlight .blocked-log-item {
+  background: rgba(254, 190, 161, 0.24);
+  color: #6d3f2b;
+  border-left: 3px solid rgba(163, 59, 70, 0.42);
+  font-weight: 600;
+}
+
+.pause-log {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #4b5a70;
+}
+
+.pause-log-item {
+  border-radius: 0.7rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(166, 196, 255, 0.2);
+}
+
 .actions {
   display: flex;
   gap: 0.55rem;
+}
+
+.actions--center {
+  justify-content: center;
+}
+
+.progress-top-actions {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .btn {
@@ -439,6 +668,27 @@ function formatTime(ms: number): string {
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--mini {
+  padding: 0.38rem 0.66rem;
+  font-size: 0.72rem;
+}
+
+.btn--block-main {
+  padding: 0.6rem 1.08rem;
+  font-size: 0.9rem;
+}
+
+.task-card--todo .btn,
+.task-card--completed .btn {
+  padding: 0.42rem 0.72rem;
+  font-size: 0.78rem;
 }
 
 .btn--primary {
@@ -466,6 +716,14 @@ function formatTime(ms: number): string {
 }
 
 .btn--ok {
+  color: #35654d;
+}
+
+.btn--pause {
+  color: #345386;
+}
+
+.btn--resume {
   color: #35654d;
 }
 </style>
