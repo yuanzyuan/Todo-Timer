@@ -88,6 +88,13 @@
       >
         开始
       </button>
+      <button
+        v-if="task.status === 'todo'"
+        @click="emit('delete-task', task.id)"
+        class="btn btn--danger"
+      >
+        删除
+      </button>
 
       <template v-if="task.status === 'in-progress'">
         <button
@@ -146,6 +153,7 @@ const emit = defineEmits<{
   (e: 'edit-priority', taskId: string, priority: '高' | '中' | '低'): void
   (e: 'edit-category', taskId: string, category: string): void
   (e: 'start-task', taskId: string): void
+  (e: 'delete-task', taskId: string): void
   (e: 'complete-task', taskId: string): void
 }>()
 
@@ -441,6 +449,11 @@ function formatTime(ms: number): string {
 .btn--success {
   background: linear-gradient(90deg, #396851, #2d5c45);
   color: #e6ffee;
+}
+
+.btn--danger {
+  background: rgba(131, 83, 60, 0.14);
+  color: #7e5038;
 }
 
 .btn--soft {

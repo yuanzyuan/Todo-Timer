@@ -28,6 +28,7 @@
             :task="task"
             :can-edit-tags="true"
             @start-task="startTask"
+            @delete-task="deleteTask"
             @edit-title="editTaskTitle"
             @edit-priority="editTaskPriority"
             @edit-category="editTaskCategory"
@@ -38,7 +39,18 @@
 
       <section class="lane lane--progress">
         <div class="lane-head">
-          <h2>In Progress <span class="live-dot"></span></h2>
+          <h2>
+            In Progress
+            <span class="live-dot-group" v-if="inProgressTasks.length > 0">
+              <span
+                v-for="(_, index) in inProgressTasks"
+                :key="`progress-dot-${index}`"
+                class="live-dot live-dot--active"
+                :style="{ animationDelay: `${index * 0.18}s` }"
+              ></span>
+            </span>
+            <span class="live-dot" v-else></span>
+          </h2>
         </div>
         <div class="lane-list">
           <TaskCard
@@ -202,6 +214,14 @@ function startTask(taskId: string) {
   inProgressTasks.value.push(task)
   todoTasks.value = [...todoTasks.value]
   inProgressTasks.value = [...inProgressTasks.value]
+  syncToLocalStorage()
+}
+
+function deleteTask(taskId: string) {
+  const taskIndex = todoTasks.value.findIndex((t) => t.id === taskId)
+  if (taskIndex === -1) return
+  todoTasks.value.splice(taskIndex, 1)
+  todoTasks.value = [...todoTasks.value]
   syncToLocalStorage()
 }
 
@@ -445,6 +465,35 @@ onMounted(() => {
   border-radius: 9999px;
   background: #415f93;
   display: inline-block;
+  opacity: 0.28;
+}
+
+.live-dot-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.live-dot--active {
+  animation: breathe-dot 2.6s ease-in-out infinite;
+}
+
+@keyframes breathe-dot {
+  0% {
+    opacity: 0.35;
+    box-shadow: 0 0 0 0 rgba(65, 95, 147, 0.26);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 8px rgba(65, 95, 147, 0.1);
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.35;
+    box-shadow: 0 0 0 0 rgba(65, 95, 147, 0.2);
+    transform: scale(1);
+  }
 }
 
 .add-btn {
